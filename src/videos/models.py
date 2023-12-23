@@ -1,6 +1,20 @@
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.text import slugify
+
+class VideoQuerySet(models.QuerySet):
+    def published(self):
+        now = timezone.now
+        return self.filter(
+            state=Video.VideoStateOptions.PUBLISH,
+            publish_timestamp_lte=now
+        )
+        
+
+class VideoManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return VideoQuerySet(self.model, using=self._db)
 
 
 # Create your models here.
